@@ -13,10 +13,12 @@ import {
   MoreHorizontal,
   PawPrint,
   Plus,
+  Save,
   Send,
   Settings2,
   Sparkles,
   Users,
+  Volume2,
   WandSparkles,
   X,
 } from "lucide-react";
@@ -133,6 +135,22 @@ function formatNumber(number: number) {
   return new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 1 }).format(number);
 }
 
+function BackgroundDoodles() {
+  const doodles = useMemo(() => Array.from({ length: 25 }, (_, index) => ({
+    id: index,
+    left: `${4 + ((index * 37) % 92)}%`,
+    top: `${7 + ((index * 29) % 88)}%`,
+    rotate: `${-25 + ((index * 31) % 55)}deg`,
+    size: 13 + ((index * 7) % 13),
+    kind: index % 4,
+  })), []);
+
+  return <div className="background-doodles" aria-hidden="true">{doodles.map((doodle) => {
+    const Icon = doodle.kind === 0 ? PawPrint : doodle.kind === 1 ? Cat : doodle.kind === 2 ? Sparkles : WandSparkles;
+    return <span key={doodle.id} style={{ left: doodle.left, top: doodle.top, transform: `rotate(${doodle.rotate})`, opacity: 0.18 + (doodle.id % 3) * 0.06 }}><Icon size={doodle.size} /></span>;
+  })}</div>;
+}
+
 function PawConfetti({ active }: { active: boolean }) {
   const bits = useMemo(() => Array.from({ length: 20 }, (_, index) => ({
     id: index,
@@ -162,6 +180,22 @@ function PawConfetti({ active }: { active: boolean }) {
       )}
     </AnimatePresence>
   );
+}
+
+function AngryCatChaos({ active }: { active: boolean }) {
+  const cats = useMemo(() => Array.from({ length: 26 }, (_, index) => ({
+    id: index,
+    left: `${4 + ((index * 41) % 91)}%`,
+    top: `${5 + ((index * 23) % 86)}%`,
+    rotate: -22 + ((index * 37) % 45),
+    scale: 0.8 + (index % 4) * 0.12,
+    meow: ["MROW!", "HSSS!", "MEE-OW!", "NO TOUCH!"][index % 4],
+  })), []);
+
+  return <AnimatePresence>{active && <motion.div className="angry-chaos" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }} aria-live="assertive">
+    <div className="chaos-banner"><Volume2 size={23} fill="currentColor" /> YOU HAVE AWAKENED THE CATS <Volume2 size={23} fill="currentColor" /></div>
+    {cats.map((cat) => <motion.div key={cat.id} className="angry-cat-doodle" initial={{ opacity: 0, scale: 0.45, rotate: cat.rotate - 20 }} animate={{ opacity: [0, 1, 1, 0.82], scale: [0.45, cat.scale, cat.scale, 0.8], rotate: [cat.rotate - 20, cat.rotate, cat.rotate + 8, cat.rotate - 5] }} transition={{ duration: 2.1, delay: (cat.id % 5) * 0.08, repeat: 2, ease: [0.34, 1.56, 0.64, 1] }} style={{ left: cat.left, top: cat.top }}><Cat size={42} strokeWidth={2.8} /><strong>{cat.meow}</strong></motion.div>)}
+  </motion.div>}</AnimatePresence>;
 }
 
 function ReactionBubble({ text }: { text: string | null }) {
@@ -264,6 +298,9 @@ function PostCard({
 
 export default function Home() {
   const [navOrder] = useState(() => shuffle(navItems));
+  const [profile, setProfile] = useState({ name: "Whiskers", handle: "@whiskers.afterdark", bio: "professional sunbeam hunter · snack quality control", avatar: ASSETS.pepper });
+  const [profileDraft, setProfileDraft] = useState(profile);
+  const [activePanel, setActivePanel] = useState<"profile" | "friends" | null>(null);
   const [draft, setDraft] = useState("");
   const cleanDraft = useRef("");
   const [attached, setAttached] = useState(false);
@@ -278,10 +315,12 @@ export default function Home() {
   const [shake, setShake] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [posted, setPosted] = useState(false);
+  const [chaosActive, setChaosActive] = useState(false);
   const [postOffset, setPostOffset] = useState({ x: 18, y: -10 });
   const glitchTimer = useRef<number | null>(null);
   const glitchEndTimer = useRef<number | null>(null);
   const toastTimer = useRef<number | null>(null);
+  const chaosTimer = useRef<number | null>(null);
 
   const bumpBadge = () => setBadgeCount((count) => count + 1);
 
@@ -289,6 +328,45 @@ export default function Home() {
     setToast(message);
     if (toastTimer.current) window.clearTimeout(toastTimer.current);
     toastTimer.current = window.setTimeout(() => setToast(null), 2800);
+  };
+
+  const playMeowChaos = () => {
+    const AudioContextClass = window.AudioContext || (window as Window & typeof globalThis & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AudioContextClass) return;
+    const audioContext = new AudioContextClass();
+    const now = audioContext.currentTime;
+    for (let index = 0; index < 17; index += 1) {
+      const oscillator = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      const start = now + (index % 6) * 0.18;
+      oscillator.type = index % 2 === 0 ? "sawtooth" : "triangle";
+      oscillator.frequency.setValueAtTime(150 + (index % 5) * 65, start);
+      oscillator.frequency.exponentialRampToValueAtTime(480 + (index % 4) * 90, start + 0.17);
+      oscillator.frequency.exponentialRampToValueAtTime(190 + (index % 3) * 45, start + 0.55);
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(0.09, start + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.62);
+      oscillator.connect(gain).connect(audioContext.destination);
+      oscillator.start(start);
+      oscillator.stop(start + 0.68);
+    }
+    window.setTimeout(() => audioContext.close(), 5200);
+  };
+
+  const triggerChaos = () => {
+    setChaosActive(true);
+    playMeowChaos();
+    if (chaosTimer.current) window.clearTimeout(chaosTimer.current);
+    chaosTimer.current = window.setTimeout(() => setChaosActive(false), 5000);
+  };
+
+  const handleNav = (label: string) => {
+    if (label === "Friends") setActivePanel("friends");
+    else if (label === "Profile") {
+      setProfileDraft(profile);
+      setActivePanel("profile");
+    } else if (label === "Litter Box Settings") showToast("There are no settings. only vibes.");
+    else document.querySelector(".composer-card")?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
 
   useEffect(() => {
@@ -308,6 +386,7 @@ export default function Home() {
       if (glitchTimer.current) window.clearTimeout(glitchTimer.current);
       if (glitchEndTimer.current) window.clearTimeout(glitchEndTimer.current);
       if (toastTimer.current) window.clearTimeout(toastTimer.current);
+      if (chaosTimer.current) window.clearTimeout(chaosTimer.current);
     };
   }, []);
 
@@ -416,21 +495,24 @@ export default function Home() {
 
   return (
     <div className={`app-shell ${shake ? "screen-shake" : ""}`}>
+      <BackgroundDoodles />
       <PawConfetti active={petConfetti} />
+      <AngryCatChaos active={chaosActive} />
       <header className="site-header">
         <div className="header-inner">
           <div className="brand-lockup"><div className="brand-mark"><PawPrint size={20} fill="currentColor" /></div><div><div className="brand-name">PawBook</div><div className="brand-sub">cats run the internet</div></div></div>
           <nav className="nav-links" aria-label="Primary navigation">
             {navOrder.map((item, index) => {
               const Icon = item.icon;
-              return <button key={item.label} className={`nav-link ${index === 0 ? "active" : ""}`} onClick={() => showToast(item.label === "Litter Box Settings" ? "There are no settings. only vibes." : `${item.label} is being supervised by a cat.`)}><Icon size={15} /> {item.label}</button>;
+              return <button key={item.label} className={`nav-link ${index === 0 ? "active" : ""}`} onClick={() => handleNav(item.label)}><Icon size={15} /> {item.label}</button>;
             })}
           </nav>
-          <div className="header-actions"><div className="notification-wrap"><button className="notification-button" aria-label="Friend requests"><Bell size={18} /></button><motion.span className="notification-badge" animate={{ scale: Math.min(1.8, 1 + badgeCount * 0.07) }} transition={{ type: "spring", stiffness: 320, damping: 16 }}>{badgeCount}</motion.span></div><div className="mini-avatar"><img src={ASSETS.pepper} alt="Your profile" /></div></div>
+          <div className="header-actions"><div className="notification-wrap"><button className="notification-button" aria-label="Friend requests" onClick={() => setActivePanel("friends")}><Bell size={18} /></button><motion.span className="notification-badge" animate={{ scale: Math.min(1.8, 1 + badgeCount * 0.07) }} transition={{ type: "spring", stiffness: 320, damping: 16 }}>{badgeCount}</motion.span></div><button className="mini-avatar" onClick={() => { setProfileDraft(profile); setActivePanel("profile"); }}><img src={profile.avatar} alt="Open your profile" /></button></div>
         </div>
       </header>
 
       <main className="page-wrap">
+        <div className="danger-rail"><div className="danger-copy"><span className="danger-squiggle" /> <strong>feeling brave?</strong><span>we strongly advise against this</span></div><button className="do-not-touch-button" onClick={triggerChaos}><Cat size={20} /> DO NOT TOUCH <span className="danger-burst">!!</span></button></div>
         <section className="intro-row">
           <div><div className="eyebrow"><span className="eyebrow-line" /> MORNING SCROLL · SEPTEMBER 02</div><h1>Good morning,<br /><span>Whiskers.</span></h1><p className="intro-copy">A carefully curated feed of cats doing more interesting things than you.</p></div>
           <div className="scroll-sticker" aria-hidden="true"><WandSparkles size={18} /><span>behold the feed</span><PawPrint size={18} fill="currentColor" /></div>
@@ -467,6 +549,24 @@ export default function Home() {
       </main>
 
       <footer className="site-footer"><span>Built by cats, for cats. <PawPrint size={13} fill="currentColor" /></span><span>the internet's least cooperative social network</span></footer>
+      <AnimatePresence>
+        {activePanel && <motion.div className="panel-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setActivePanel(null)}>
+          <motion.section className={`interaction-panel ${activePanel === "friends" ? "friends-panel" : "profile-panel"}`} initial={{ opacity: 0, y: 22, scale: .95, rotate: -1 }} animate={{ opacity: 1, y: 0, scale: 1, rotate: 0 }} exit={{ opacity: 0, y: 12, scale: .96 }} transition={{ type: "spring", stiffness: 300, damping: 22 }} onClick={(event) => event.stopPropagation()} role="dialog" aria-modal="true">
+            <button className="panel-close" onClick={() => setActivePanel(null)} aria-label="Close panel"><X size={18} /></button>
+            {activePanel === "friends" ? <>
+              <div className="panel-icon"><Users size={24} /></div><span className="panel-kicker">THE FRIENDS DEPARTMENT</span><h2>No friends, :(</h2><p className="panel-copy">Add some! Or don’t. The cats have made peace with both outcomes.</p><div className="friend-empty-doodle"><Cat size={62} /><PawPrint size={28} fill="currentColor" /><span>friendship is a human construct</span></div><button className="primary-button panel-action" onClick={() => showToast("Friend request sent to a cat. It will be ignored with dignity.")}><Plus size={16} /> Add a cat anyway</button>
+            </> : <>
+              <div className="panel-heading"><div className="panel-icon pink-icon"><Cat size={24} /></div><div><span className="panel-kicker">YOUR PROFILE</span><h2>Edit profile</h2></div></div>
+              <div className="profile-edit-avatar"><img src={profileDraft.avatar} alt="Profile preview" /></div>
+              <div className="avatar-choices">{[ASSETS.pepper, ASSETS.mochi, ASSETS.biscuit, ASSETS.nori].map((avatar) => <button key={avatar} className={profileDraft.avatar === avatar ? "selected" : ""} onClick={() => setProfileDraft({ ...profileDraft, avatar })}><img src={avatar} alt="Choose avatar" /></button>)}</div>
+              <label className="field-label">name<input value={profileDraft.name} onChange={(event) => setProfileDraft({ ...profileDraft, name: event.target.value })} /></label>
+              <label className="field-label">handle<input value={profileDraft.handle} onChange={(event) => setProfileDraft({ ...profileDraft, handle: event.target.value })} /></label>
+              <label className="field-label">bio<textarea rows={2} value={profileDraft.bio} onChange={(event) => setProfileDraft({ ...profileDraft, bio: event.target.value })} /></label>
+              <button className="primary-button panel-action" onClick={() => { setProfile(profileDraft); setActivePanel(null); showToast("Profile updated. The cats are pretending to care."); }}><Save size={16} /> Save profile</button>
+            </>}
+          </motion.section>
+        </motion.div>}
+      </AnimatePresence>
       <AnimatePresence>{toast && <motion.div className="toast" initial={{ opacity: 0, y: 20, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 12 }} transition={{ type: "spring", stiffness: 360, damping: 22 }}><PawPrint size={16} fill="currentColor" /> {toast}</motion.div>}</AnimatePresence>
     </div>
   );
