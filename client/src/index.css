@@ -274,6 +274,19 @@ h1, h2, p { margin: 0; }
 .cat-logic-button.chaos-mini { background: var(--lavender); }
 .image-demand { position: absolute; right: 12px; top: 12px; display: inline-flex; align-items: center; gap: 4px; padding: 6px 8px; border: 1px solid var(--ink); border-radius: 9px; background: var(--pink); color: var(--ink); box-shadow: 2px 2px 0 var(--ink); font-family: "Caveat", cursive; font-size: 15px; font-weight: 700; opacity: 0; transform: rotate(5deg) translateY(-5px); transition: opacity 180ms ease, transform 180ms cubic-bezier(.34,1.56,.64,1); pointer-events: none; }
 .post-image-wrap:hover .image-demand, .post-card.ambient-pulse .image-demand { opacity: 1; transform: rotate(-3deg) translateY(0); }
+.cat-popup-backdrop { position: fixed; inset: 0; z-index: 95; display: grid; place-items: center; overflow: hidden; padding: 20px; background: color-mix(in srgb, var(--ink) 68%, transparent); }
+.cat-popup-backdrop.hungry { background: color-mix(in srgb, #d9914f 52%, var(--ink) 42%); }
+.cat-popup-backdrop.nap { background: color-mix(in srgb, #6671b8 38%, var(--ink) 58%); }
+.cat-popup-card { position: relative; z-index: 2; width: min(470px, calc(100vw - 34px)); padding: 38px 34px 31px; text-align: center; background: var(--lilac-pale); color: var(--ink); border: 2px solid var(--ink); border-radius: 25px 31px 22px 28px; box-shadow: 9px 10px 0 var(--ink); }
+.cat-popup-card h2 { margin-top: 12px; font-family: "Fredoka", sans-serif; font-size: clamp(31px, 6vw, 48px); line-height: .95; letter-spacing: -.04em; }
+.cat-popup-card p { max-width: 330px; margin: 14px auto 24px; font-size: 14px; line-height: 1.45; }
+.cat-popup-icon { width: 58px; height: 58px; display: grid; place-items: center; margin: 0 auto 14px; border: 2px solid var(--ink); border-radius: 17px 20px 15px 19px; background: var(--pink); color: var(--ink); transform: rotate(-7deg); box-shadow: 3px 3px 0 var(--ink); }
+.cat-popup-close { position: absolute; top: 13px; right: 13px; width: 31px; height: 31px; display: grid; place-items: center; border: 1.5px solid var(--ink); border-radius: 50%; background: var(--butter); cursor: pointer; }
+.cat-popup-close:hover { transform: rotate(14deg) scale(1.1); background: var(--pink); }
+.cat-popup-rain, .doodle-burst { position: fixed; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; }
+.cat-popup-rain span, .doodle-burst span { position: absolute; top: -10vh; color: var(--butter); font-family: "Caveat", cursive; font-size: clamp(24px, 4vw, 42px); font-weight: 700; filter: drop-shadow(2px 2px 0 var(--ink)); }
+.doodle-burst { z-index: 85; }
+.doodle-burst span { color: var(--pink); }
 .mini-avatar { display: block; padding: 0; border: 1.5px solid var(--ink); cursor: pointer; }
 .danger-rail { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin: -18px 0 34px; padding: 13px 17px; background: var(--pink); border: 1.5px dashed var(--ink); border-radius: 14px 19px 13px 18px; box-shadow: 3px 3px 0 var(--ink); transform: rotate(-.35deg); }
 .danger-copy { display: flex; align-items: baseline; gap: 9px; font-size: 11px; }

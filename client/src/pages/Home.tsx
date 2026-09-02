@@ -161,7 +161,34 @@ function AmbientDoodles() {
   </div>;
 }
 
-function CatLogicLayer({ onNotice, onChaos }: { onNotice: (message: string) => void; onChaos: () => void }) {
+type PopupKind = "hungry" | "nap" | "evidence" | "attention";
+
+function CatLogicPopup({ popup, onClose }: { popup: { title: string; copy: string; kind: PopupKind } | null; onClose: () => void }) {
+  const doodleMap: Record<PopupKind, string[]> = {
+    hungry: ["🍪", "🥨", "🍪", "🧁", "🍪", "🥐", "🍪", "🍩"],
+    nap: ["Z", "☾", "Z", "✦", "z", "☁", "Z", "✦"],
+    evidence: ["✦", "⌁", "✦", "♢", "⌁", "✦", "♢", "⌁"],
+    attention: ["✦", "♡", "✦", "🐾", "♡", "✦", "🐾", "✦"],
+  };
+  return <AnimatePresence>{popup && <motion.div className={`cat-popup-backdrop ${popup.kind}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
+    <div className="cat-popup-rain" aria-hidden="true">{[...doodleMap[popup.kind], ...doodleMap[popup.kind]].map((doodle, index) => <motion.span key={`${doodle}-${index}`} initial={{ y: "-15vh", opacity: 0, rotate: -20 }} animate={{ y: "115vh", opacity: [0, 1, 1, 0], rotate: 20 + index * 31 }} transition={{ duration: 2.8 + (index % 4) * .35, delay: (index % 8) * .09, ease: "linear" }} style={{ left: `${4 + (index * 17) % 94}%` }}>{doodle}</motion.span>)}</div>
+    <motion.section className="cat-popup-card" initial={{ opacity: 0, scale: .82, y: 18, rotate: -3 }} animate={{ opacity: 1, scale: 1, y: 0, rotate: 1 }} exit={{ opacity: 0, scale: .9, y: 10 }} transition={{ type: "spring", stiffness: 280, damping: 20 }} role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
+      <button className="cat-popup-close" onClick={onClose} aria-label="Close cat logic popup"><X size={18} /></button>
+      <div className="cat-popup-icon"><PawPrint size={27} fill="currentColor" /></div>
+      <span className="panel-kicker">CAT LOGIC HAS SPOKEN</span>
+      <h2>{popup.title}</h2>
+      <p>{popup.copy}</p>
+      <button className="primary-button" onClick={onClose}>I understand (probably)</button>
+    </motion.section>
+  </motion.div>}</AnimatePresence>;
+}
+
+function DoodleBurst({ kind, active }: { kind: PopupKind | null; active: boolean }) {
+  const doodles = kind === "hungry" ? ["🍪", "🥨", "🍩", "🧁"] : kind === "nap" ? ["Z", "☾", "☁", "✦"] : ["✦", "🐾", "♡", "⌁"];
+  return <AnimatePresence>{active && <div className="doodle-burst" aria-hidden="true">{Array.from({ length: 18 }, (_, index) => <motion.span key={index} initial={{ y: -40, opacity: 0, rotate: -15 }} animate={{ y: "105vh", opacity: [0, 1, 1, 0], rotate: 180 + index * 22 }} transition={{ duration: 1.6 + (index % 4) * .18, delay: (index % 6) * .04, ease: "linear" }} style={{ left: `${3 + (index * 29) % 94}%` }}>{doodles[index % doodles.length]}</motion.span>)}</div>}</AnimatePresence>;
+}
+
+function CatLogicLayer({ onNotice, onPopup, onChaos }: { onNotice: (message: string) => void; onPopup: (popup: { title: string; copy: string; kind: PopupKind }) => void; onChaos: () => void }) {
   const controls = useMemo(() => shuffle([
     { label: "FEED ME", message: "The cats have moved the food bowl. Check under the feed." },
     { label: "NAP NOW", message: "Excellent decision. The internet can wait." },
@@ -173,7 +200,7 @@ function CatLogicLayer({ onNotice, onChaos }: { onNotice: (message: string) => v
     { top: "78%", left: "45%", rotate: "-3deg" },
   ];
   return <div className="cat-logic-layer" aria-label="Cat logic controls">
-    {controls.map((control, index) => <button key={control.label} className="cat-logic-button" style={positions[index]} onClick={() => onNotice(control.message)} onMouseEnter={() => onNotice(index === 0 ? "You found the food button. It is judging you." : "The button has noticed your attention.")}><PawPrint size={14} fill="currentColor" /> {control.label}</button>)}
+    {controls.map((control, index) => <button key={control.label} className="cat-logic-button" style={positions[index]} onClick={() => onPopup(index === 0 ? { title: "THE CAT IS HUNGRY", copy: "Your attention has been converted into snack debt. Cookies are falling until further notice.", kind: "hungry" } : index === 1 ? { title: "NAP PROTOCOL ACTIVATED", copy: "Please lower your voice and stop expecting productivity from this household.", kind: "nap" } : { title: "EVIDENCE REMOVED", copy: "The suspicious activity has been filed under ‘the cat did it’.", kind: "evidence" })} onMouseEnter={() => onNotice(index === 0 ? "You found the food button. It is judging you." : "The button has noticed your attention.")}><PawPrint size={14} fill="currentColor" /> {control.label}</button>)}
     <button className="cat-logic-button chaos-mini" style={{ top: "91%", right: "7%", rotate: "-4deg" }} onClick={onChaos}><Cat size={14} /> AGAIN?</button>
   </div>;
 }
@@ -356,7 +383,7 @@ export default function Home() {
   const [attached, setAttached] = useState(false);
   const [dodgeCount, setDodgeCount] = useState(0);
   const [obstructionCount, setObstructionCount] = useState(0);
-  const [badgeCount, setBadgeCount] = useState(3);
+  const [badgeCount, setBadgeCount] = useState(0);
   const [reaction, setReaction] = useState<string | null>(null);
   const [glitching, setGlitching] = useState(false);
   const [typingGlitches, setTypingGlitches] = useState(0);
@@ -366,13 +393,22 @@ export default function Home() {
   const [toast, setToast] = useState<string | null>(null);
   const [posted, setPosted] = useState(false);
   const [chaosActive, setChaosActive] = useState(false);
+  const [catPopup, setCatPopup] = useState<{ title: string; copy: string; kind: PopupKind } | null>(null);
+  const [doodleBurstKind, setDoodleBurstKind] = useState<PopupKind | null>(null);
   const [postOffset, setPostOffset] = useState({ x: 18, y: -10 });
   const glitchTimer = useRef<number | null>(null);
   const glitchEndTimer = useRef<number | null>(null);
   const toastTimer = useRef<number | null>(null);
   const chaosTimer = useRef<number | null>(null);
+  const doodleBurstTimer = useRef<number | null>(null);
 
-  const bumpBadge = () => setBadgeCount((count) => count + 1);
+  const bumpBadge = () => setBadgeCount(0);
+
+  const triggerDoodleBurst = (kind: PopupKind) => {
+    setDoodleBurstKind(kind);
+    if (doodleBurstTimer.current) window.clearTimeout(doodleBurstTimer.current);
+    doodleBurstTimer.current = window.setTimeout(() => setDoodleBurstKind(null), 1900);
+  };
 
   const showToast = (message: string) => {
     setToast(message);
@@ -437,6 +473,7 @@ export default function Home() {
       if (glitchEndTimer.current) window.clearTimeout(glitchEndTimer.current);
       if (toastTimer.current) window.clearTimeout(toastTimer.current);
       if (chaosTimer.current) window.clearTimeout(chaosTimer.current);
+      if (doodleBurstTimer.current) window.clearTimeout(doodleBurstTimer.current);
     };
   }, []);
 
@@ -510,7 +547,7 @@ export default function Home() {
     setAttached(false);
     setDodgeCount(0);
     setObstructionCount(0);
-    setBadgeCount(3);
+    setBadgeCount(0);
     setReaction(null);
     setGlitching(false);
     setTypingGlitches(0);
@@ -547,7 +584,9 @@ export default function Home() {
     <div className={`app-shell ${shake ? "screen-shake" : ""}`}>
       <BackgroundDoodles />
       <AmbientDoodles />
-      <CatLogicLayer onNotice={showToast} onChaos={triggerChaos} />
+      <CatLogicLayer onNotice={showToast} onPopup={(popup) => { setCatPopup(popup); triggerDoodleBurst(popup.kind); }} onChaos={triggerChaos} />
+      <CatLogicPopup popup={catPopup} onClose={() => setCatPopup(null)} />
+      <DoodleBurst kind={doodleBurstKind} active={Boolean(doodleBurstKind)} />
       <PawConfetti active={petConfetti} />
       <AngryCatChaos active={chaosActive} />
       <header className="site-header">
@@ -587,7 +626,7 @@ export default function Home() {
 
             <div className="feed-heading"><div><span className="section-kicker">THE SCRATCHING POST</span><h2>Fresh from the clowder</h2></div><button className="sort-button" onClick={() => showToast("The feed is already perfectly sorted by cat approval.")}>Latest <ChevronRight size={15} /></button></div>
             <div className="posts-list">
-              {posts.map((post) => <PostCard key={post.id} post={post} pulsing={pulsePost === post.id - 1} onFeedInteraction={bumpBadge} onNotice={showToast} onPet={post.id === 6 ? handlePet : undefined} />)}
+              {posts.map((post) => <PostCard key={post.id} post={post} pulsing={pulsePost === post.id - 1} onFeedInteraction={() => { bumpBadge(); triggerDoodleBurst("attention"); }} onNotice={showToast} onPet={post.id === 6 ? handlePet : undefined} />)}
             </div>
           </section>
 
