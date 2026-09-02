@@ -1,4 +1,4 @@
-# PawBook — Cats Run the Internet
+# PawBook — FaceBook but run by cats
 
 PawBook is a playful, intentionally unpredictable cat social-feed experience. It rejects conventional interface behavior in favor of **cat logic**: important controls move around, images demand attention, hover states cause unexpected reactions, and every interaction may produce a different kind of mischief.
 
