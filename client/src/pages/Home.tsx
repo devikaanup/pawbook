@@ -175,19 +175,19 @@ function CatLogicPopup({ popup, onClose }: { popup: { title: string; copy: strin
     nap: ["Z", "☾", "Z", "✦", "z", "☁", "Z", "✦"],
     evidence: ["✦", "⌁", "✦", "♢", "⌁", "✦", "♢", "⌁"],
     attention: ["✦", "♡", "✦", "🐾", "♡", "✦", "🐾", "✦"],
-    fish: ["🐟", "🐠", "🫧", "🥺", "🍣", "🐟", "🐾", "✨"],
+    fish: ["😈", "😼", "🐟", "🐾", "💥", "✨", "🔥", "😈"],
   };
   return <AnimatePresence>{popup && <motion.div className={`cat-popup-backdrop ${popup.kind}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
     <div className="cat-popup-rain" aria-hidden="true">{[...doodleMap[popup.kind], ...doodleMap[popup.kind]].map((doodle, index) => <motion.span key={`${doodle}-${index}`} initial={{ y: "-15vh", opacity: 0, rotate: -20 }} animate={{ y: "115vh", opacity: [0, 1, 1, 0], rotate: 20 + index * 31 }} transition={{ duration: 2.8 + (index % 4) * .35, delay: (index % 8) * .09, ease: "linear" }} style={{ left: `${4 + (index * 17) % 94}%` }}>{doodle}</motion.span>)}</div>
     <motion.section className="cat-popup-card" initial={{ opacity: 0, scale: .82, y: 18, rotate: -3 }} animate={{ opacity: 1, scale: 1, y: 0, rotate: 1 }} exit={{ opacity: 0, scale: .9, y: 10 }} transition={{ type: "spring", stiffness: 280, damping: 20 }} role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
       <button className="cat-popup-close" onClick={onClose} aria-label="Close cat logic popup"><X size={18} /></button>
       <div className="cat-popup-icon">{popup.kind === "fish" ? <Fish size={28} strokeWidth={2.4} /> : <PawPrint size={27} fill="currentColor" />}</div>
-      <span className="panel-kicker">{popup.kind === "fish" ? "PAAVAM CAT APPEAL" : "CAT LOGIC HAS SPOKEN"}</span>
+      <span className="panel-kicker">{popup.kind === "fish" ? "EVIL CAT MASTERPLAN" : "CAT LOGIC HAS SPOKEN"}</span>
       <h2>{popup.title}</h2>
       <p>{popup.copy}</p>
       {popup.kind === "fish" ? (
         <a href="./antigrav.html" className="primary-button" onClick={onClose}>
-          Here is your fish, paavam cat 🐟
+          Click on to find out about my evil plans 😈
         </a>
       ) : (
         <button className="primary-button" onClick={onClose}>
@@ -204,7 +204,7 @@ function DoodleBurst({ kind, active }: { kind: PopupKind | null; active: boolean
     : kind === "nap"
     ? ["Z", "☾", "☁", "✦"]
     : kind === "fish"
-    ? ["🐟", "🐠", "🫧", "🍣", "🥺"]
+    ? ["😈", "😼", "🐟", "💥", "🔥"]
     : ["✦", "🐾", "♡", "⌁"];
   return <AnimatePresence>{active && <div className="doodle-burst" aria-hidden="true">{Array.from({ length: 18 }, (_, index) => <motion.span key={index} initial={{ y: -40, opacity: 0, rotate: -15 }} animate={{ y: "105vh", opacity: [0, 1, 1, 0], rotate: 180 + index * 22 }} transition={{ duration: 1.6 + (index % 4) * .18, delay: (index % 6) * .04, ease: "linear" }} style={{ left: `${3 + (index * 29) % 94}%` }}>{doodles[index % doodles.length]}</motion.span>)}</div>}</AnimatePresence>;
 }
@@ -444,18 +444,18 @@ export default function Home() {
     setFishSwimming(true);
     window.setTimeout(() => setFishSwimming(false), 700);
 
-    const paavamQuotes = [
-      "🥺 Look at my innocent face! I did not knock the glass off the counter.",
-      "🐟 Paavam cat received fish! Innocence level restored to 100%.",
-      "🥺 Im just a baby... a tiny paavam creature who deserves unlimited treats.",
-      "🐟 Fish accepted! The 3am zoomies are temporarily postponed.",
-      "🥺 You clicked the paavam button. All cat crimes are hereby forgiven."
+    const evilQuotes = [
+      "😈 You have unlocked the cat's secret villain arc.",
+      "😼 The innocent look was a trap. The evil plans are in motion.",
+      "😈 Step 1: Push glass off counter. Step 2: Take over the UIverse.",
+      "😼 All cat crimes were 100% premeditated. Find out more!",
+      "😈 You clicked the evil button. There is no turning back."
     ];
-    const randomQuote = paavamQuotes[Math.floor(Math.random() * paavamQuotes.length)];
+    const randomQuote = evilQuotes[Math.floor(Math.random() * evilQuotes.length)];
 
     setCatPopup({
-      title: "IM PAAVAM 🥺🐟",
-      copy: "Look into these round innocent eyes. I have never done anything wrong in my entire nine lives. The broken vase was gravity's fault. Pwease feed more fish.",
+      title: "IM EVIL 😈🐾",
+      copy: "You fell right into my trap, human. The innocent act was just a distraction. Click below to inspect my top-secret evil plans.",
       kind: "fish",
     });
     triggerDoodleBurst("fish");
@@ -709,7 +709,7 @@ export default function Home() {
           </motion.section>
         </motion.div>}
       </AnimatePresence>
-      <aside className="bottom-fish-container" aria-label="Paavam fish button">
+      <aside className="bottom-fish-container" aria-label="Evil cat plans button">
         <motion.button
           type="button"
           className={`big-fish-button ${fishSwimming ? "fish-swimming" : ""}`}
@@ -725,20 +725,20 @@ export default function Home() {
             duration: 3.2,
             ease: "easeInOut",
           }}
-          aria-label="I am paavam fish button"
+          aria-label="I am evil cat button"
         >
           <div className="fish-badge-bubble">
             <span className="bubble-1">🫧</span>
-            <span className="bubble-2">🫧</span>
+            <span className="bubble-2">😈</span>
           </div>
           <div className="fish-art-wrap">
             <Fish size={28} className="fish-icon-svg" strokeWidth={2.4} />
-            <span className="fish-art-emoji">🐟</span>
+            <span className="fish-art-emoji">😈</span>
           </div>
           <div className="fish-text-group">
-            <span className="fish-paavam-heading">im paavam</span>
+            <span className="fish-paavam-heading">im evil 😈</span>
             <span className="fish-paavam-sub">
-              {paavamCount > 0 ? `fish fed: ${paavamCount} 🥺` : "pwease give fish 🥺"}
+              click on to find out about my evil plans
             </span>
           </div>
           <span className="fish-sparkle-decor" aria-hidden="true">✦</span>
