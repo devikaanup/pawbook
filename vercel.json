@@ -2,9 +2,18 @@
   "buildCommand": "vite build",
   "outputDirectory": "dist/public",
   "framework": "vite",
+  "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/antigrav.html",
+      "destination": "/antigrav.html"
+    },
+    {
+      "source": "/antigrav",
+      "destination": "/antigrav.html"
+    },
+    {
+      "source": "/((?!antigrav).*)*",
       "destination": "/index.html"
     }
   ]

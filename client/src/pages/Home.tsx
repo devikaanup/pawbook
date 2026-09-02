@@ -186,7 +186,7 @@ function CatLogicPopup({ popup, onClose }: { popup: { title: string; copy: strin
       <h2>{popup.title}</h2>
       <p>{popup.copy}</p>
       {popup.kind === "fish" ? (
-        <a href="/antigrav.html" className="primary-button" onClick={onClose}>
+        <a href="./antigrav.html" className="primary-button" onClick={onClose}>
           Here is your fish, paavam cat 🐟
         </a>
       ) : (
