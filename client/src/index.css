@@ -238,7 +238,7 @@ h1, h2, p { margin: 0; }
 .site-footer { position: relative; z-index: 1; max-width: 1240px; margin: 0 auto; padding: 22px 28px 28px; border-top: 1px solid var(--ink); display: flex; justify-content: space-between; gap: 18px; font-size: 10px; letter-spacing: .03em; }
 .site-footer span:first-child { display: inline-flex; align-items: center; gap: 5px; font-weight: 800; }
 .site-footer span:last-child { opacity: .58; }
-.toast { position: fixed; z-index: 50; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 9px; max-width: calc(100vw - 32px); padding: 12px 16px; background: var(--ink); color: var(--butter); border: 1.5px solid var(--ink); border-radius: 13px; box-shadow: 4px 4px 0 var(--lavender); font-size: 12px; font-weight: 700; text-align: center; }
+.toast { position: fixed; z-index: 60; bottom: 84px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 9px; max-width: calc(100vw - 32px); padding: 12px 16px; background: var(--ink); color: var(--butter); border: 1.5px solid var(--ink); border-radius: 13px; box-shadow: 4px 4px 0 var(--lavender); font-size: 12px; font-weight: 700; text-align: center; }
 .confetti-layer { position: fixed; inset: 0; z-index: 45; pointer-events: none; overflow: hidden; }
 .confetti-paw { position: absolute; top: 15%; filter: drop-shadow(1px 1px 0 var(--ink)); }
 .screen-shake { animation: shake .42s cubic-bezier(.34,1.56,.64,1); }
@@ -277,6 +277,7 @@ h1, h2, p { margin: 0; }
 .cat-popup-backdrop { position: fixed; inset: 0; z-index: 95; display: grid; place-items: center; overflow: hidden; padding: 20px; background: color-mix(in srgb, var(--ink) 68%, transparent); }
 .cat-popup-backdrop.hungry { background: color-mix(in srgb, #d9914f 52%, var(--ink) 42%); }
 .cat-popup-backdrop.nap { background: color-mix(in srgb, #6671b8 38%, var(--ink) 58%); }
+.cat-popup-backdrop.fish { background: color-mix(in srgb, #38bdf8 45%, var(--ink) 55%); }
 .cat-popup-card { position: relative; z-index: 2; width: min(470px, calc(100vw - 34px)); padding: 38px 34px 31px; text-align: center; background: var(--lilac-pale); color: var(--ink); border: 2px solid var(--ink); border-radius: 25px 31px 22px 28px; box-shadow: 9px 10px 0 var(--ink); }
 .cat-popup-card h2 { margin-top: 12px; font-family: "Fredoka", sans-serif; font-size: clamp(31px, 6vw, 48px); line-height: .95; letter-spacing: -.04em; }
 .cat-popup-card p { max-width: 330px; margin: 14px auto 24px; font-size: 14px; line-height: 1.45; }
@@ -412,6 +413,151 @@ h1, h2, p { margin: 0; }
   .do-not-touch-button { width: 100%; }
   .interaction-panel { padding: 28px 20px 23px; }
 }
+
+/* Big Fish "im paavam" Button */
+.bottom-fish-container {
+  position: fixed;
+  bottom: 22px;
+  right: 24px;
+  z-index: 48;
+  pointer-events: auto;
+}
+
+@media (max-width: 640px) {
+  .bottom-fish-container {
+    bottom: 16px;
+    right: 16px;
+  }
+}
+
+.big-fish-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px 12px 15px;
+  background: linear-gradient(135deg, #a7dff0 0%, #cbf2ff 45%, #FFD6E8 100%);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 36px 16px 36px 16px;
+  box-shadow: 4px 5px 0 var(--ink);
+  cursor: pointer;
+  user-select: none;
+  overflow: visible;
+  transition: box-shadow 180ms cubic-bezier(.34,1.56,.64,1), filter 180ms ease;
+}
+
+.big-fish-button:hover {
+  box-shadow: 6px 7px 0 var(--ink);
+  filter: brightness(1.03);
+}
+
+.big-fish-button:active {
+  box-shadow: 2px 2px 0 var(--ink);
+  transform: translate(2px, 2px);
+}
+
+.fish-art-wrap {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  background: var(--butter);
+  border: 1.5px solid var(--ink);
+  border-radius: 50% 45% 50% 45%;
+  transform: rotate(-6deg);
+  box-shadow: 2px 2px 0 var(--lavender);
+  flex-shrink: 0;
+}
+
+.fish-icon-svg {
+  color: #0284c7;
+  transition: transform 200ms ease;
+}
+
+.fish-art-emoji {
+  position: absolute;
+  bottom: -4px;
+  right: -5px;
+  font-size: 15px;
+}
+
+.fish-text-group {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.fish-paavam-heading {
+  font-family: "Fredoka", sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-shadow: 1px 1px 0 var(--butter);
+}
+
+.fish-paavam-sub {
+  font-family: "Caveat", cursive;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+  color: #334155;
+  margin-top: 3px;
+}
+
+.fish-badge-bubble {
+  position: absolute;
+  top: -12px;
+  left: 10px;
+  pointer-events: none;
+  font-size: 14px;
+  display: flex;
+  gap: 3px;
+}
+
+.bubble-1 {
+  display: inline-block;
+  animation: float-bubble 2.2s infinite ease-in-out;
+}
+
+.bubble-2 {
+  display: inline-block;
+  animation: float-bubble 2.8s infinite ease-in-out 0.8s;
+}
+
+@keyframes float-bubble {
+  0%, 100% { transform: translateY(0) scale(0.9); opacity: 0.7; }
+  50% { transform: translateY(-8px) scale(1.15); opacity: 1; }
+}
+
+.fish-sparkle-decor {
+  font-size: 17px;
+  color: var(--lavender);
+  animation: spin-sparkle 3s infinite linear;
+}
+
+@keyframes spin-sparkle {
+  0% { transform: rotate(0deg) scale(0.9); }
+  50% { transform: rotate(180deg) scale(1.25); }
+  100% { transform: rotate(360deg) scale(0.9); }
+}
+
+.fish-swimming {
+  animation: fish-swim 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes fish-swim {
+  0% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.15) rotate(-8deg) translateX(-4px); }
+  50% { transform: scale(1.18) rotate(8deg) translateX(4px); }
+  75% { transform: scale(1.1) rotate(-4deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
 }
+

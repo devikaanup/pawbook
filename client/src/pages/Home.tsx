@@ -7,6 +7,7 @@ import {
   Check,
   CircleDot,
   ChevronRight,
+  Fish,
   Heart,
   ImagePlus,
   Instagram,
@@ -166,7 +167,7 @@ function AmbientDoodles() {
   </div>;
 }
 
-type PopupKind = "hungry" | "nap" | "evidence" | "attention";
+type PopupKind = "hungry" | "nap" | "evidence" | "attention" | "fish";
 
 function CatLogicPopup({ popup, onClose }: { popup: { title: string; copy: string; kind: PopupKind } | null; onClose: () => void }) {
   const doodleMap: Record<PopupKind, string[]> = {
@@ -174,22 +175,29 @@ function CatLogicPopup({ popup, onClose }: { popup: { title: string; copy: strin
     nap: ["Z", "☾", "Z", "✦", "z", "☁", "Z", "✦"],
     evidence: ["✦", "⌁", "✦", "♢", "⌁", "✦", "♢", "⌁"],
     attention: ["✦", "♡", "✦", "🐾", "♡", "✦", "🐾", "✦"],
+    fish: ["🐟", "🐠", "🫧", "🥺", "🍣", "🐟", "🐾", "✨"],
   };
   return <AnimatePresence>{popup && <motion.div className={`cat-popup-backdrop ${popup.kind}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
     <div className="cat-popup-rain" aria-hidden="true">{[...doodleMap[popup.kind], ...doodleMap[popup.kind]].map((doodle, index) => <motion.span key={`${doodle}-${index}`} initial={{ y: "-15vh", opacity: 0, rotate: -20 }} animate={{ y: "115vh", opacity: [0, 1, 1, 0], rotate: 20 + index * 31 }} transition={{ duration: 2.8 + (index % 4) * .35, delay: (index % 8) * .09, ease: "linear" }} style={{ left: `${4 + (index * 17) % 94}%` }}>{doodle}</motion.span>)}</div>
     <motion.section className="cat-popup-card" initial={{ opacity: 0, scale: .82, y: 18, rotate: -3 }} animate={{ opacity: 1, scale: 1, y: 0, rotate: 1 }} exit={{ opacity: 0, scale: .9, y: 10 }} transition={{ type: "spring", stiffness: 280, damping: 20 }} role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
       <button className="cat-popup-close" onClick={onClose} aria-label="Close cat logic popup"><X size={18} /></button>
-      <div className="cat-popup-icon"><PawPrint size={27} fill="currentColor" /></div>
-      <span className="panel-kicker">CAT LOGIC HAS SPOKEN</span>
+      <div className="cat-popup-icon">{popup.kind === "fish" ? <Fish size={28} strokeWidth={2.4} /> : <PawPrint size={27} fill="currentColor" />}</div>
+      <span className="panel-kicker">{popup.kind === "fish" ? "PAAVAM CAT APPEAL" : "CAT LOGIC HAS SPOKEN"}</span>
       <h2>{popup.title}</h2>
       <p>{popup.copy}</p>
-      <button className="primary-button" onClick={onClose}>I understand (probably)</button>
+      <button className="primary-button" onClick={onClose}>{popup.kind === "fish" ? "Here is your fish, paavam cat 🐟" : "I understand (probably)"}</button>
     </motion.section>
   </motion.div>}</AnimatePresence>;
 }
 
 function DoodleBurst({ kind, active }: { kind: PopupKind | null; active: boolean }) {
-  const doodles = kind === "hungry" ? ["🍪", "🥨", "🍩", "🧁"] : kind === "nap" ? ["Z", "☾", "☁", "✦"] : ["✦", "🐾", "♡", "⌁"];
+  const doodles = kind === "hungry"
+    ? ["🍪", "🥨", "🍩", "🧁"]
+    : kind === "nap"
+    ? ["Z", "☾", "☁", "✦"]
+    : kind === "fish"
+    ? ["🐟", "🐠", "🫧", "🍣", "🥺"]
+    : ["✦", "🐾", "♡", "⌁"];
   return <AnimatePresence>{active && <div className="doodle-burst" aria-hidden="true">{Array.from({ length: 18 }, (_, index) => <motion.span key={index} initial={{ y: -40, opacity: 0, rotate: -15 }} animate={{ y: "105vh", opacity: [0, 1, 1, 0], rotate: 180 + index * 22 }} transition={{ duration: 1.6 + (index % 4) * .18, delay: (index % 6) * .04, ease: "linear" }} style={{ left: `${3 + (index * 29) % 94}%` }}>{doodles[index % doodles.length]}</motion.span>)}</div>}</AnimatePresence>;
 }
 
@@ -401,6 +409,8 @@ export default function Home() {
   const [catPopup, setCatPopup] = useState<{ title: string; copy: string; kind: PopupKind } | null>(null);
   const [doodleBurstKind, setDoodleBurstKind] = useState<PopupKind | null>(null);
   const [postOffset, setPostOffset] = useState({ x: 18, y: -10 });
+  const [paavamCount, setPaavamCount] = useState(0);
+  const [fishSwimming, setFishSwimming] = useState(false);
   const glitchTimer = useRef<number | null>(null);
   const glitchEndTimer = useRef<number | null>(null);
   const toastTimer = useRef<number | null>(null);
@@ -419,6 +429,29 @@ export default function Home() {
     setToast(message);
     if (toastTimer.current) window.clearTimeout(toastTimer.current);
     toastTimer.current = window.setTimeout(() => setToast(null), 2800);
+  };
+
+  const handleFishClick = () => {
+    setPaavamCount((count) => count + 1);
+    setFishSwimming(true);
+    window.setTimeout(() => setFishSwimming(false), 700);
+
+    const paavamQuotes = [
+      "🥺 Look at my innocent face! I did not knock the glass off the counter.",
+      "🐟 Paavam cat received fish! Innocence level restored to 100%.",
+      "🥺 Im just a baby... a tiny paavam creature who deserves unlimited treats.",
+      "🐟 Fish accepted! The 3am zoomies are temporarily postponed.",
+      "🥺 You clicked the paavam button. All cat crimes are hereby forgiven."
+    ];
+    const randomQuote = paavamQuotes[Math.floor(Math.random() * paavamQuotes.length)];
+
+    setCatPopup({
+      title: "IM PAAVAM 🥺🐟",
+      copy: "Look into these round innocent eyes. I have never done anything wrong in my entire nine lives. The broken vase was gravity's fault. Pwease feed more fish.",
+      kind: "fish",
+    });
+    triggerDoodleBurst("fish");
+    showToast(randomQuote);
   };
 
   const playMeowChaos = () => {
@@ -668,6 +701,42 @@ export default function Home() {
           </motion.section>
         </motion.div>}
       </AnimatePresence>
+      <aside className="bottom-fish-container" aria-label="Paavam fish button">
+        <motion.button
+          type="button"
+          className={`big-fish-button ${fishSwimming ? "fish-swimming" : ""}`}
+          onClick={handleFishClick}
+          whileHover={{ scale: 1.07, rotate: -2 }}
+          whileTap={{ scale: 0.94, rotate: 3 }}
+          animate={{
+            y: [0, -6, 0],
+            rotate: [-1.2, 1.2, -1.2],
+          }}
+          transition={{
+            repeat: Infinity,
+            duration: 3.2,
+            ease: "easeInOut",
+          }}
+          aria-label="I am paavam fish button"
+        >
+          <div className="fish-badge-bubble">
+            <span className="bubble-1">🫧</span>
+            <span className="bubble-2">🫧</span>
+          </div>
+          <div className="fish-art-wrap">
+            <Fish size={28} className="fish-icon-svg" strokeWidth={2.4} />
+            <span className="fish-art-emoji">🐟</span>
+          </div>
+          <div className="fish-text-group">
+            <span className="fish-paavam-heading">im paavam</span>
+            <span className="fish-paavam-sub">
+              {paavamCount > 0 ? `fish fed: ${paavamCount} 🥺` : "pwease give fish 🥺"}
+            </span>
+          </div>
+          <span className="fish-sparkle-decor" aria-hidden="true">✦</span>
+        </motion.button>
+      </aside>
+
       <AnimatePresence>{toast && <motion.div className="toast" initial={{ opacity: 0, y: 20, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 12 }} transition={{ type: "spring", stiffness: 360, damping: 22 }}><PawPrint size={16} fill="currentColor" /> {toast}</motion.div>}</AnimatePresence>
     </div>
   );
