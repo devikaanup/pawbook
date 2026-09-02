@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANTIGRAV CAT LABS — the cat did the UX</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --mustard:#F2B705;
+    --terracotta:#C1440E;
+    --void:#1A1A1A;
+    --fish:#DCE3E8;
+    --danger:#E63946;
+    --paper:#FBF6EC;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;
+    padding:0;
+    background:var(--paper);
+    color:var(--void);
+    font-family:'Fredoka',sans-serif;
+    overflow-x:hidden;
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28"><text y="20" font-size="20">🐾</text></svg>') 14 14, auto;
+    min-height:100vh;
+    position:relative;
+  }
+
+  /* nothing on this page respects a grid. that is the point. */
+  .chaos-field{
+    position:relative;
+    width:100%;
+    min-height:100vh;
+  }
+
+  header{
+    padding:2rem 2rem 0 2rem;
+    position:relative;
+    z-index:5;
+  }
+
+  .brand{
+    font-family:'Space Mono',monospace;
+    font-weight:700;
+    font-size:0.85rem;
+    letter-spacing:0.02em;
+    display:inline-block;
+    background:var(--void);
+    color:var(--mustard);
+    padding:0.4rem 0.8rem;
+    transform:rotate(-2deg);
+    border-radius:3px;
+  }
+
+  .back-btn{
+    font-family:'Space Mono',monospace;
+    font-size:0.8rem;
+    text-decoration:none;
+    color:var(--void);
+    background:var(--mustard);
+    padding:0.4rem 0.8rem;
+    border:2px solid var(--void);
+    border-radius:3px;
+    font-weight:700;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    transition:transform 0.15s ease, background 0.15s ease;
+  }
+  .back-btn:hover{
+    transform:scale(1.06) rotate(-2deg);
+    background:var(--terracotta);
+    color:var(--paper);
+  }
+
+  .hero{
+    position:relative;
+    padding:1rem 2rem 4rem 2rem;
+    min-height:78vh;
+  }
+
+  h1.big{
+    font-size:clamp(2.8rem, 8vw, 6.5rem);
+    line-height:0.95;
+    margin:1.2rem 0 0 0;
+    max-width:11ch;
+    transform:rotate(-1.2deg);
+    position:relative;
+    z-index:3;
+  }
+
+  h1.big span{
+    display:inline-block;
+    transition:transform 0.15s ease;
+  }
+  h1.big span:hover{
+    transform:translateY(-14px) rotate(8deg) scale(1.15);
+    color:var(--terracotta);
+  }
+
+  .subhead{
+    font-family:'Space Mono',monospace;
+    font-size:0.95rem;
+    max-width:32ch;
+    margin-top:1.5rem;
+    background:var(--fish);
+    padding:0.9rem 1.1rem;
+    border:2px solid var(--void);
+    border-radius:2px;
+    transform:rotate(2deg);
+    position:relative;
+    z-index:3;
+  }
+
+  /* the important button. it does not want to be pressed. */
+  #fleebtn{
+    position:fixed;
+    z-index:50;
+    font-family:'Fredoka',sans-serif;
+    font-weight:600;
+    font-size:1.05rem;
+    background:var(--danger);
+    color:var(--paper);
+    border:3px solid var(--void);
+    border-radius:999px;
+    padding:1rem 1.8rem;
+    cursor:pointer;
+    box-shadow:5px 5px 0 var(--void);
+    transition:top 0.18s ease, left 0.18s ease, transform 0.12s ease;
+    top:30vh;
+    left:60vw;
+  }
+  #fleebtn:active{
+    transform:scale(0.9) rotate(20deg);
+  }
+
+  .caught-msg{
+    position:fixed;
+    z-index:60;
+    font-family:'Space Mono',monospace;
+    background:var(--void);
+    color:var(--mustard);
+    padding:1.4rem 1.8rem;
+    border-radius:8px;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%) scale(0);
+    transition:transform 0.3s cubic-bezier(.68,-0.55,.27,1.55);
+    text-align:center;
+    max-width:320px;
+    pointer-events:none;
+  }
+  .caught-msg.show{
+    transform:translate(-50%,-50%) scale(1);
+  }
+
+  /* random floating demanding images */
+  .demander{
+    position:absolute;
+    width:120px;
+    border:3px solid var(--void);
+    border-radius:6px;
+    background:var(--fish);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:2.6rem;
+    cursor:pointer;
+    transition:transform 0.25s ease, box-shadow 0.25s ease;
+    z-index:4;
+    user-select:none;
+    box-shadow:4px 4px 0 rgba(0,0,0,0.15);
+  }
+  .demander:hover{
+    transform:scale(1.6) rotate(-6deg);
+    box-shadow:10px 10px 0 var(--terracotta);
+    z-index:20;
+  }
+  .demander.yelling{
+    animation:yell 0.5s ease infinite;
+  }
+  @keyframes yell{
+    0%,100%{transform:rotate(-4deg) scale(1.05);}
+    50%{transform:rotate(4deg) scale(1.15);}
+  }
+  .demander .yap{
+    position:absolute;
+    top:-2.6rem;
+    font-family:'Space Mono',monospace;
+    font-size:0.65rem;
+    background:var(--void);
+    color:var(--paper);
+    padding:0.3rem 0.5rem;
+    border-radius:4px;
+    white-space:nowrap;
+    opacity:0;
+    transition:opacity 0.2s ease;
+  }
+  .demander:hover .yap{opacity:1;}
+
+  /* the nav that refuses to be a nav */
+  nav{
+    position:absolute;
+    z-index:6;
+  }
+  nav a{
+    display:inline-block;
+    font-family:'Space Mono',monospace;
+    font-size:0.8rem;
+    text-decoration:none;
+    color:var(--void);
+    background:var(--mustard);
+    padding:0.5rem 0.9rem;
+    border:2px solid var(--void);
+    border-radius:3px;
+    margin:0.3rem;
+    transition:transform 0.2s ease, background 0.2s ease;
+  }
+  nav a:hover{
+    transform:rotate(-10deg) translateY(-6px) scale(1.1);
+    background:var(--terracotta);
+    color:var(--paper);
+  }
+
+  section{
+    position:relative;
+    padding:5rem 2rem;
+  }
+
+  .knock-title{
+    font-size:clamp(1.8rem,5vw,3rem);
+    display:inline-block;
+    transform:rotate(-2deg);
+    position:relative;
+    background:var(--void);
+    color:var(--fish);
+    padding:0.3rem 0.9rem;
+    border-radius:3px;
+  }
+
+  /* the robot section */
+  .robot-zone{
+    background:var(--void);
+    padding:5rem 2rem 7rem 2rem;
+    position:relative;
+    overflow:hidden;
+    text-align:center;
+  }
+  .robot-zone h2{
+    color:var(--mustard);
+    font-size:clamp(1.8rem,5vw,3.2rem);
+    margin-bottom:0.5rem;
+    transform:rotate(1deg);
+  }
+  .robot-zone p.desc{
+    color:var(--fish);
+    font-family:'Space Mono',monospace;
+    max-width:38ch;
+    margin:0 auto 3rem auto;
+    font-size:0.9rem;
+  }
+
+  .robot-stage{
+    position:relative;
+    height:340px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .robocat{
+    font-size:7rem;
+    position:relative;
+    animation:antigrav 3.6s ease-in-out infinite;
+    filter:drop-shadow(0 0 24px rgba(242,183,5,0.35));
+    cursor:pointer;
+    transition:transform 0.25s ease;
+  }
+  @keyframes antigrav{
+    0%,100%{transform:translateY(0) rotate(-3deg);}
+    50%{transform:translateY(-46px) rotate(3deg);}
+  }
+  .robocat:hover{
+    animation-play-state:paused;
+    transform:translateY(-70px) rotate(360deg) scale(1.2);
+    transition:transform 0.6s ease;
+  }
+
+  .thruster{
+    position:absolute;
+    bottom:18%;
+    font-size:1.6rem;
+    opacity:0.85;
+    animation:flicker 0.4s ease-in-out infinite alternate;
+  }
+  @keyframes flicker{
+    from{opacity:0.4; transform:scale(0.85) translateY(0);}
+    to{opacity:1; transform:scale(1.15) translateY(6px);}
+  }
+
+  .stat-strip{
+    display:flex;
+    gap:1rem;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin-top:3rem;
+  }
+  .stat{
+    font-family:'Space Mono',monospace;
+    color:var(--void);
+    background:var(--mustard);
+    padding:0.8rem 1.1rem;
+    border-radius:4px;
+    font-size:0.78rem;
+    transform:rotate(var(--r,0deg));
+    transition:transform 0.2s ease;
+  }
+  .stat:nth-child(1){--r:-3deg;}
+  .stat:nth-child(2){--r:2deg;}
+  .stat:nth-child(3){--r:-1.5deg;}
+  .stat:hover{transform:rotate(0deg) scale(1.1);}
+
+  /* order form section, deliberately unhelpful */
+  .order-zone{
+    padding:5rem 2rem;
+    background:var(--fish);
+    position:relative;
+  }
+  .order-card{
+    max-width:420px;
+    margin:2rem auto 0 auto;
+    background:var(--paper);
+    border:3px solid var(--void);
+    border-radius:10px;
+    padding:2rem;
+    transform:rotate(-1deg);
+    box-shadow:8px 8px 0 var(--void);
+  }
+  .order-card label{
+    display:block;
+    font-family:'Space Mono',monospace;
+    font-size:0.8rem;
+    margin:1rem 0 0.4rem 0;
+  }
+  .order-card input, .order-card select{
+    width:100%;
+    padding:0.6rem;
+    border:2px solid var(--void);
+    border-radius:4px;
+    font-family:'Fredoka',sans-serif;
+    font-size:0.95rem;
+  }
+  .order-card input:focus, .order-card select:focus{
+    outline:3px solid var(--terracotta);
+    transform:rotate(1deg);
+  }
+  .submit-row{
+    margin-top:1.6rem;
+    display:flex;
+    justify-content:flex-end;
+  }
+  #realsubmit{
+    font-family:'Fredoka',sans-serif;
+    font-weight:600;
+    background:var(--void);
+    color:var(--mustard);
+    border:none;
+    border-radius:999px;
+    padding:0.8rem 1.6rem;
+    cursor:pointer;
+    transition:transform 0.15s ease;
+  }
+  #realsubmit:hover{
+    transform:rotate(-6deg) scale(1.05);
+  }
+  .knocked-note{
+    font-family:'Space Mono',monospace;
+    font-size:0.7rem;
+    color:var(--terracotta);
+    margin-top:0.6rem;
+    transform:rotate(-3deg);
+  }
+
+  footer{
+    background:var(--void);
+    color:var(--fish);
+    font-family:'Space Mono',monospace;
+    font-size:0.75rem;
+    padding:2rem;
+    text-align:center;
+  }
+
+  .paw-trail{
+    position:fixed;
+    pointer-events:none;
+    font-size:1.1rem;
+    z-index:100;
+    opacity:0.9;
+    animation:fade-paw 1s ease forwards;
+  }
+  @keyframes fade-paw{
+    to{opacity:0; transform:translateY(10px) scale(0.7);}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<div class="chaos-field" id="field">
+
+  <header>
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <div class="brand">ANTIGRAV CAT LABS™ — ux by a cat</div>
+      <a href="/" class="back-btn">← Back to PawBook 🐾</a>
+    </div>
+  </header>
+
+  <nav style="top:110px; left:60%;">
+    <a href="#robot">the robot</a>
+    <a href="#order">get one</a>
+    <a href="/" style="background:var(--mustard);">pawbook home</a>
+  </nav>
+
+  <section class="hero">
+    <h1 class="big">
+      <span>Your</span> <span>website</span><br>
+      <span>now</span> <span>has</span> <span>a</span><br>
+      <span>cat</span> <span>in</span> <span>charge.</span>
+    </h1>
+    <p class="subhead">// no principle survived contact with the cat. buttons flee. images demand worship. nothing is where you expect.</p>
+
+    <button id="fleebtn">Click me. I dare you.</button>
+
+    <div class="demander" id="fish1" style="top:8%; left:8%;">
+      🐟<span class="yap">notice me</span>
+    </div>
+    <div class="demander" id="mouse1" style="top:60%; left:78%; width:100px; height:100px;">
+      🐁<span class="yap">i squeak now</span>
+    </div>
+    <div class="demander" id="yarn1" style="top:78%; left:20%; width:90px; height:90px;">
+      🧶<span class="yap">unravel me</span>
+    </div>
+  </section>
+
+  <div class="caught-msg" id="caughtMsg">you actually caught it.<br>the cat is disappointed in both of us.</div>
+
+  <section>
+    <h2 class="knock-title">things the cat approved</h2>
+    <p style="max-width:52ch; font-family:'Space Mono',monospace; font-size:0.85rem; margin-top:1.2rem; transform:rotate(0.6deg);">
+      Every "feature" below was knocked off a shelf, sat on, or ignored at 3am until it became load-bearing. This is the roadmap now.
+    </p>
+  </section>
+
+  <section id="robot" class="robot-zone">
+    <h2>The Evil Cats are taking the UIverse.</h2>
+    <p class="desc">// it hovers because the cat refused to accept that gravity applies to it. so it doesn't. anymore. hover the robot. it will not react the way you think.</p>
+    <div class="robot-stage">
+      <span class="thruster" style="left:38%;">✨</span>
+      <div class="robocat" id="robocat">🐈⬛</div>
+      <span class="thruster" style="right:38%;">✨</span>
+    </div>
+    <div class="stat-strip">
+      <div class="stat">LIFT: purely emotional</div>
+      <div class="stat">FUEL: knocked-over water glass</div>
+      <div class="stat">SAFETY RATING: none consulted</div>
+    </div>
+  </section>
+
+  <section id="order" class="order-zone">
+    <h2 class="knock-title" style="background:var(--void);">acquire the UIverse</h2>
+    <div class="order-card">
+      <label for="nm">your name (the cat will forget it)</label>
+      <input id="nm" type="text" placeholder="doesn't matter">
+      <label for="col">preferred antigravity color</label>
+      <select id="col">
+        <option>3am void black</option>
+        <option>knocked-over-plant terracotta</option>
+        <option>suspicious mustard</option>
+        <option>"why is the floor wet" blue</option>
+      </select>
+      <label for="pledge">do you promise to feed it on the cat's schedule, not yours?</label>
+      <select id="pledge">
+        <option>yes, unconditionally</option>
+        <option>yes, at 4:58am specifically</option>
+      </select>
+      <div class="submit-row">
+        <button id="realsubmit" type="button">Deploy robot</button>
+      </div>
+      <div class="knocked-note">note: form fields may relocate if disturbed.</div>
+    </div>
+  </section>
+
+  <footer>
+    ANTIGRAV CAT LABS — no principles were followed in the making of this site. all bugs are features the cat is sitting on.
+  </footer>
+
+</div>
+
+<script>
+  // paw print trail on mousemove, throttled
+  let lastPaw = 0;
+  document.addEventListener('mousemove', (e) => {
+    const now = Date.now();
+    if(now - lastPaw < 220) return;
+    lastPaw = now;
+    const paw = document.createElement('div');
+    paw.className = 'paw-trail';
+    paw.textContent = '🐾';
+    paw.style.left = (e.clientX - 8) + 'px';
+    paw.style.top = (e.clientY - 8) + 'px';
+    document.body.appendChild(paw);
+    setTimeout(()=>paw.remove(), 1000);
+  });
+
+  // the button that flees the cursor
+  const btn = document.getElementById('fleebtn');
+  const caughtMsg = document.getElementById('caughtMsg');
+  let caughtCount = 0;
+
+  function placeButtonRandomly(){
+    const margin = 90;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const x = margin + Math.random() * (w - margin*2.4);
+    const y = margin + Math.random() * (h - margin*2.4);
+    btn.style.left = x + 'px';
+    btn.style.top = y + 'px';
+  }
+  placeButtonRandomly();
+
+  function fleeFrom(e){
+    const rect = btn.getBoundingClientRect();
+    const bx = rect.left + rect.width/2;
+    const by = rect.top + rect.height/2;
+    const dx = bx - e.clientX;
+    const dy = by - e.clientY;
+    const dist = Math.hypot(dx, dy);
+    if(dist < 140){
+      placeButtonRandomly();
+    }
+  }
+  document.addEventListener('mousemove', fleeFrom);
+
+  btn.addEventListener('click', () => {
+    caughtCount++;
+    caughtMsg.classList.add('show');
+    setTimeout(()=>caughtMsg.classList.remove('show'), 1800);
+    placeButtonRandomly();
+  });
+
+  // demander images: random attention-seeking
+  const demanders = document.querySelectorAll('.demander');
+  function randomYell(){
+    demanders.forEach(d => {
+      if(Math.random() < 0.5){
+        d.classList.add('yelling');
+        setTimeout(()=>d.classList.remove('yelling'), 900);
+      }
+    });
+  }
+  setInterval(randomYell, 2600);
+
+  demanders.forEach(d => {
+    d.addEventListener('click', () => {
+      d.style.transform = `scale(0) rotate(${Math.random()*360}deg)`;
+      setTimeout(() => {
+        d.style.top = (Math.random()*70+5) + '%';
+        d.style.left = (Math.random()*80+5) + '%';
+        d.style.transform = '';
+      }, 350);
+    });
+  });
+
+  // robot: unexpected reaction on hover — teleports a thruster puff and meows via title change
+  const robocat = document.getElementById('robocat');
+  const meows = ['mrow.','no.','purr (mockingly)','*knocks something off*','absolutely not.','mrrp?'];
+  robocat.addEventListener('mouseenter', () => {
+    robocat.setAttribute('title', meows[Math.floor(Math.random()*meows.length)]);
+  });
+
+  // order form: fields gently drift if you linger, because the cat sat near them
+  const orderInputs = document.querySelectorAll('.order-card input, .order-card select');
+  orderInputs.forEach(inp => {
+    inp.addEventListener('focus', () => {
+      const wob = (Math.random()*4 - 2).toFixed(1);
+      inp.style.transform = `rotate(${wob}deg)`;
+    });
+  });
+
+  document.getElementById('realsubmit').addEventListener('click', () => {
+    const b = document.getElementById('realsubmit');
+    b.textContent = 'the cat is thinking about it';
+    setTimeout(()=>{ b.textContent = 'request filed under "later"'; }, 1400);
+  });
+
+  window.addEventListener('resize', placeButtonRandomly);
+</script>
+
+</body>
+</html>

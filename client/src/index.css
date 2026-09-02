@@ -154,6 +154,7 @@ h1, h2, p { margin: 0; }
 .post-cta-wrap { position: relative; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .primary-button, .secondary-button, .pet-button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 1.5px solid var(--ink); cursor: pointer; font-weight: 800; transition: transform 160ms cubic-bezier(.34,1.56,.64,1), box-shadow 160ms cubic-bezier(.34,1.56,.64,1), background-color 160ms cubic-bezier(.34,1.56,.64,1); }
 .primary-button { background: var(--pink); padding: 10px 16px; border-radius: 12px 14px 11px 13px; box-shadow: 3px 3px 0 var(--ink); font-size: 12px; }
+a.primary-button { text-decoration: none; color: inherit; }
 .primary-button:hover { box-shadow: 5px 5px 0 var(--ink); transform: translate(-2px, -2px); }
 .primary-button:active, .secondary-button:active, .pet-button:active { transform: scale(.97); }
 .post-button { position: relative; z-index: 2; min-width: 92px; will-change: transform; }

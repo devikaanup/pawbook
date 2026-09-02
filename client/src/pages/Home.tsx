@@ -185,7 +185,15 @@ function CatLogicPopup({ popup, onClose }: { popup: { title: string; copy: strin
       <span className="panel-kicker">{popup.kind === "fish" ? "PAAVAM CAT APPEAL" : "CAT LOGIC HAS SPOKEN"}</span>
       <h2>{popup.title}</h2>
       <p>{popup.copy}</p>
-      <button className="primary-button" onClick={onClose}>{popup.kind === "fish" ? "Here is your fish, paavam cat 🐟" : "I understand (probably)"}</button>
+      {popup.kind === "fish" ? (
+        <a href="/antigrav.html" className="primary-button" onClick={onClose}>
+          Here is your fish, paavam cat 🐟
+        </a>
+      ) : (
+        <button className="primary-button" onClick={onClose}>
+          I understand (probably)
+        </button>
+      )}
     </motion.section>
   </motion.div>}</AnimatePresence>;
 }
