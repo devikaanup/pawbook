@@ -161,6 +161,23 @@ function AmbientDoodles() {
   </div>;
 }
 
+function CatLogicLayer({ onNotice, onChaos }: { onNotice: (message: string) => void; onChaos: () => void }) {
+  const controls = useMemo(() => shuffle([
+    { label: "FEED ME", message: "The cats have moved the food bowl. Check under the feed." },
+    { label: "NAP NOW", message: "Excellent decision. The internet can wait." },
+    { label: "HIDE EVIDENCE", message: "Evidence hidden behind the suspiciously warm laptop." },
+  ]), []);
+  const positions = [
+    { top: "27%", left: "4%", rotate: "-7deg" },
+    { top: "52%", right: "2%", rotate: "5deg" },
+    { top: "78%", left: "45%", rotate: "-3deg" },
+  ];
+  return <div className="cat-logic-layer" aria-label="Cat logic controls">
+    {controls.map((control, index) => <button key={control.label} className="cat-logic-button" style={positions[index]} onClick={() => onNotice(control.message)} onMouseEnter={() => onNotice(index === 0 ? "You found the food button. It is judging you." : "The button has noticed your attention.")}><PawPrint size={14} fill="currentColor" /> {control.label}</button>)}
+    <button className="cat-logic-button chaos-mini" style={{ top: "91%", right: "7%", rotate: "-4deg" }} onClick={onChaos}><Cat size={14} /> AGAIN?</button>
+  </div>;
+}
+
 function PawConfetti({ active }: { active: boolean }) {
   const bits = useMemo(() => Array.from({ length: 20 }, (_, index) => ({
     id: index,
@@ -291,8 +308,9 @@ function PostCard({
           </div>
           <span className="post-tag">{post.tag}</span>
         </div>
-        <div className="post-image-wrap">
+        <div className="post-image-wrap" onMouseEnter={() => onNotice(["LOOK AT ME.", "I am the main character now.", "The cat demands one compliment."][post.id % 3])}>
           <img className="post-image" src={post.image} alt={`Illustration from ${post.cat}`} />
+          <span className="image-demand" aria-hidden="true"><Sparkles size={14} /> LOOK HERE <Sparkles size={14} /></span>
           {pulsing && <motion.span className="image-attention" initial={{ opacity: 0, scale: 0.7 }} animate={{ opacity: [0, 1, 0], scale: [0.7, 1.12, 1.35] }} transition={{ duration: 1.1, repeat: 1 }}><Sparkles size={20} fill="currentColor" /></motion.span>}
           {isPet && (
             <button className="pet-button" onClick={onPet}>
@@ -529,6 +547,7 @@ export default function Home() {
     <div className={`app-shell ${shake ? "screen-shake" : ""}`}>
       <BackgroundDoodles />
       <AmbientDoodles />
+      <CatLogicLayer onNotice={showToast} onChaos={triggerChaos} />
       <PawConfetti active={petConfetti} />
       <AngryCatChaos active={chaosActive} />
       <header className="site-header">
