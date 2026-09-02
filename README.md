@@ -4,6 +4,11 @@ PawBook is a playful, intentionally unpredictable cat social-feed experience. It
 
 > **Design principle:** The interface is usable, but never fully obedient. Users should understand what an action does while still feeling that the cats are in charge.
 
+## 🌐 Live Demo
+
+- **PawBook Social Feed:** [https://pawbook-ashy.vercel.app/](https://pawbook-ashy.vercel.app/)
+- **Antigrav Cat Labs:** [https://pawbook-ashy.vercel.app/antigrav.html](https://pawbook-ashy.vercel.app/antigrav.html)
+
 ## Experience Overview
 
 The main page presents an afternoon “post-nap scroll” feed filled with cat posts, comments, reactions, profile controls, friends, litter-box settings, falling yarn, and flying butterflies. The visual language uses a warm scrapbook palette, hand-drawn typography, irregular borders, paper-like textures, and animated doodles.
@@ -22,6 +27,7 @@ Clicking a random button does not simply perform a predictable utility action. E
 | **NAP NOW** | **NAP PROTOCOL ACTIVATED** | Sleep-related doodles such as `Z`, moons, clouds, and stars drift downward. The popup instructs the user to stop expecting productivity. |
 | **HIDE EVIDENCE** | **EVIDENCE REMOVED** | Sparkles, diamonds, and scribble-like marks fall across the page. The popup claims that suspicious activity has been filed under “the cat did it.” |
 | **AGAIN?** | **Chaos replay** | Replays the angry-cat chaos sequence with a full-screen interruption and synthesized meows. |
+| **im evil 😈** | **EVIL CAT MASTERPLAN** | Showers of `😈`, `😼`, `🐟`, `💥`, and `🔥` rain down. The popup reveals the cat's secret villain arc with a portal to Antigrav Cat Labs. |
 
 The popup can be dismissed by clicking its close button, clicking the acknowledgement button, or clicking outside the popup. The themed doodle shower continues briefly even if the popup is dismissed, because the cats do not respond immediately to human requests.
 
@@ -77,6 +83,19 @@ The Save settings action provides confirmation feedback without connecting to a 
 
 The notification and friend-request indicators are intentionally set to **0**. Post interactions do not increase the number. This keeps the notification state calm even when the rest of the interface behaves chaotically.
 
+### The "im evil 😈" Button & Antigrav Cat Labs
+
+A prominent floating button anchored to the bottom-right of the screen displays **"im evil 😈"** with the prompt *"click on to find out about my evil plans"*.
+
+- **Interactive Villain Arc**: Clicking triggers the **EVIL CAT MASTERPLAN** modal popup with sarcastic quotes (*"Step 1: Push glass off counter. Step 2: Take over the UIverse."*) and falling showers of fire, devil faces, and explosion doodles (`😈`, `😼`, `🐟`, `💥`, `🔥`).
+- **Portal to Antigrav Cat Labs (`antigrav.html`)**: Clicking the evil plans action button seamlessly transports the user to **ANTIGRAV CAT LABS** — a standalone, grid-defying cat UX laboratory:
+  - **Fleeing Button**: A button (`#fleebtn`) that runs away whenever the user's cursor approaches.
+  - **Attention-Seeking Demanders**: Interactive floating items (`🐟`, `🐁`, `🧶`) that yell and relocate across the viewport when clicked.
+  - **Hovering Robocat**: *"The Evil Cats are taking the UIverse."* — an antigravity cat hovering over thruster flames that meows sarcastically on hover.
+  - **Unhelpful Order Form**: *"acquire the UIverse"* — form fields that drift and rotate out of alignment when focused.
+  - **Paw Trail Cursor**: Real-time paw prints dynamically tracking cursor movement.
+  - **Seamless Navigation**: Includes a quick return button (*"← Back to PawBook 🐾"*) to jump back to the main feed.
+
 ## Technology
 
 - React 19
@@ -93,16 +112,21 @@ The notification and friend-request indicators are intentionally set to **0**. P
 ```text
 client/
   index.html
+  antigrav.html
+  public/
+    antigrav.html
   src/
     App.tsx
     index.css
     main.tsx
     pages/
       Home.tsx
+      NotFound.tsx
     components/
     contexts/
     hooks/
     lib/
+    media/
 server/
 shared/
 ```
