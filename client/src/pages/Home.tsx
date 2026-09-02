@@ -23,13 +23,18 @@ import {
   WandSparkles,
   X,
 } from "lucide-react";
+import biscuitImage from "../media/pawbook-avatar-biscuit.jpg";
+import mochiImage from "../media/pawbook-avatar-mochi.jpg";
+import noriImage from "../media/pawbook-avatar-nori.jpg";
+import pepperImage from "../media/pawbook-avatar-pepper.jpg";
+import successImage from "../media/pawbook-success-cat.jpg";
 
 const ASSETS = {
-  mochi: "/manus-storage/pawbook-avatar-mochi_c24e1bfa.png",
-  biscuit: "/manus-storage/pawbook-avatar-biscuit_7449b7e3.png",
-  nori: "/manus-storage/pawbook-avatar-nori_f1106abe.png",
-  pepper: "/manus-storage/pawbook-avatar-pepper_ed60742c.png",
-  success: "/manus-storage/pawbook-success-cat_7d08bbb6.png",
+  mochi: mochiImage,
+  biscuit: biscuitImage,
+  nori: noriImage,
+  pepper: pepperImage,
+  success: successImage,
 };
 
 const palette = ["#f8f1c7", "#dedcff", "#FFD6E8", "#aea5f3", "#a7dff0"];
