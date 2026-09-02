@@ -271,7 +271,7 @@ function PostCard({
           <motion.div
             className={`avatar-frame ${hovered ? "avatar-wobble" : ""}`}
             animate={hovered ? { rotate: [0, -5, 5, 0] } : { rotate: 0 }}
-            transition={{ duration: 0.42, type: "spring", stiffness: 400, damping: 15 }}
+            transition={{ duration: 0.42, type: "tween", ease: [0.34, 1.56, 0.64, 1] }}
           >
             <img src={post.avatar} alt={`${post.cat} avatar`} />
           </motion.div>
