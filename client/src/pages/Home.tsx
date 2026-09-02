@@ -5,6 +5,7 @@ import {
   Camera,
   Cat,
   Check,
+  CircleDot,
   ChevronRight,
   Heart,
   ImagePlus,
@@ -151,6 +152,15 @@ function BackgroundDoodles() {
   })}</div>;
 }
 
+function AmbientDoodles() {
+  const yarns = useMemo(() => Array.from({ length: 9 }, (_, index) => ({ id: index, left: `${7 + index * 11}%`, delay: index * 0.7, duration: 7 + (index % 4), rotate: -25 + index * 17 })), []);
+  const butterflies = useMemo(() => Array.from({ length: 5 }, (_, index) => ({ id: index, top: `${15 + index * 16}%`, delay: index * 1.2, duration: 10 + index })), []);
+  return <div className="ambient-doodles" aria-hidden="true">
+    {yarns.map((yarn) => <motion.span key={`yarn-${yarn.id}`} className="falling-yarn" initial={{ y: -90, rotate: yarn.rotate, opacity: 0 }} animate={{ y: ["-10vh", "120vh"], rotate: [yarn.rotate, yarn.rotate + 260], opacity: [0, .75, .75, 0] }} transition={{ duration: yarn.duration, delay: yarn.delay, repeat: Infinity, ease: "linear" }} style={{ left: yarn.left }}><CircleDot size={24} strokeWidth={2.4} /></motion.span>)}
+    {butterflies.map((butterfly) => <motion.span key={`butterfly-${butterfly.id}`} className="flying-butterfly" initial={{ x: "-12vw", y: 0, rotate: -8 }} animate={{ x: ["-12vw", "112vw"], y: [0, -22, 14, -8, 0], rotate: [-8, 10, -5, 8, -8] }} transition={{ duration: butterfly.duration, delay: butterfly.delay, repeat: Infinity, ease: [0.34, 1.56, 0.64, 1] }} style={{ top: butterfly.top }}><span>ʚ</span><span>ɞ</span><small>✦</small></motion.span>)}
+  </div>;
+}
+
 function PawConfetti({ active }: { active: boolean }) {
   const bits = useMemo(() => Array.from({ length: 20 }, (_, index) => ({
     id: index,
@@ -220,16 +230,29 @@ function PostCard({
   post,
   pulsing,
   onFeedInteraction,
+  onNotice,
   onPet,
 }: {
   post: (typeof posts)[number];
   pulsing: boolean;
   onFeedInteraction: () => void;
+  onNotice: (message: string) => void;
   onPet?: () => void;
 }) {
   const [liked, setLiked] = useState(false);
   const [hovered, setHovered] = useState(false);
+  const [commentList, setCommentList] = useState(["the paw print composition is honestly perfect.", "would like to see the behind-the-scenes nap."]);
+  const [commentDraft, setCommentDraft] = useState("");
+  const [commentsOpen, setCommentsOpen] = useState(true);
   const isPet = Boolean(onPet);
+
+  const submitComment = (event: React.FormEvent) => {
+    event.preventDefault();
+    const clean = commentDraft.trim();
+    if (!clean) return;
+    setCommentList((current) => [...current, clean]);
+    setCommentDraft("");
+  };
 
   return (
     <motion.article
@@ -257,7 +280,7 @@ function PostCard({
             <div className="author-meta">{post.handle} · {post.time}</div>
           </div>
         </div>
-        <button className="icon-button" aria-label="More post options"><MoreHorizontal size={19} /></button>
+        <button className="icon-button" aria-label="More post options" onClick={() => onNotice("More post options are being inspected by a cat.")}><MoreHorizontal size={19} /></button>
       </div>
 
       <div className="post-body">
@@ -289,9 +312,15 @@ function PostCard({
         >
           <Heart size={17} fill={liked ? "currentColor" : "none"} /> {formatNumber(post.likes + (liked ? 1 : 0))}
         </button>
-        <button className="post-action" onClick={onFeedInteraction}><MessageCircle size={17} /> {post.comments}</button>
-        <button className="post-action post-share" onClick={onFeedInteraction}><Send size={16} /></button>
+        <button className="post-action" onClick={() => { setCommentsOpen((open) => !open); onFeedInteraction(); }}><MessageCircle size={17} /> {post.comments + commentList.length}</button>
+        <button className="post-action post-share" onClick={() => { onFeedInteraction(); onNotice("Post copied to the catnip clipboard."); }}><Send size={16} /></button>
       </div>
+      <AnimatePresence initial={false}>
+        {commentsOpen && <motion.div className="comments-drawer" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ type: "spring", stiffness: 280, damping: 24 }}>
+          <div className="comment-list">{commentList.map((comment, index) => <div className="comment-line" key={`${comment}-${index}`}><span className="comment-avatar"><PawPrint size={12} fill="currentColor" /></span><span><strong>{index % 2 === 0 ? "Mochi" : "Biscuit"}</strong> {comment}</span></div>)}</div>
+          <form className="comment-form" onSubmit={submitComment}><input value={commentDraft} onChange={(event) => setCommentDraft(event.target.value)} placeholder="Add a comment cats will pretend to read..." aria-label="Add a comment" /><button type="submit" aria-label="Send comment"><Send size={14} /></button></form>
+        </motion.div>}
+      </AnimatePresence>
     </motion.article>
   );
 }
@@ -300,7 +329,10 @@ export default function Home() {
   const [navOrder] = useState(() => shuffle(navItems));
   const [profile, setProfile] = useState({ name: "Whiskers", handle: "@whiskers.afterdark", bio: "professional sunbeam hunter · snack quality control", avatar: ASSETS.pepper });
   const [profileDraft, setProfileDraft] = useState(profile);
-  const [activePanel, setActivePanel] = useState<"profile" | "friends" | null>(null);
+  const [activePanel, setActivePanel] = useState<"profile" | "friends" | "settings" | null>(null);
+  const [friendSearch, setFriendSearch] = useState("");
+  const [friendsList, setFriendsList] = useState<string[]>([]);
+  const [friendSearchOpen, setFriendSearchOpen] = useState(false);
   const [draft, setDraft] = useState("");
   const cleanDraft = useRef("");
   const [attached, setAttached] = useState(false);
@@ -335,16 +367,16 @@ export default function Home() {
     if (!AudioContextClass) return;
     const audioContext = new AudioContextClass();
     const now = audioContext.currentTime;
-    for (let index = 0; index < 17; index += 1) {
+    for (let index = 0; index < 48; index += 1) {
       const oscillator = audioContext.createOscillator();
       const gain = audioContext.createGain();
-      const start = now + (index % 6) * 0.18;
+      const start = now + index * 0.105;
       oscillator.type = index % 2 === 0 ? "sawtooth" : "triangle";
       oscillator.frequency.setValueAtTime(150 + (index % 5) * 65, start);
       oscillator.frequency.exponentialRampToValueAtTime(480 + (index % 4) * 90, start + 0.17);
       oscillator.frequency.exponentialRampToValueAtTime(190 + (index % 3) * 45, start + 0.55);
       gain.gain.setValueAtTime(0.0001, start);
-      gain.gain.exponentialRampToValueAtTime(0.09, start + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.13, start + 0.05);
       gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.62);
       oscillator.connect(gain).connect(audioContext.destination);
       oscillator.start(start);
@@ -361,11 +393,11 @@ export default function Home() {
   };
 
   const handleNav = (label: string) => {
-    if (label === "Friends") setActivePanel("friends");
+    if (label === "Friends") { setFriendSearchOpen(false); setActivePanel("friends"); }
     else if (label === "Profile") {
       setProfileDraft(profile);
       setActivePanel("profile");
-    } else if (label === "Litter Box Settings") showToast("There are no settings. only vibes.");
+    } else if (label === "Litter Box Settings") setActivePanel("settings");
     else document.querySelector(".composer-card")?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
 
@@ -496,6 +528,7 @@ export default function Home() {
   return (
     <div className={`app-shell ${shake ? "screen-shake" : ""}`}>
       <BackgroundDoodles />
+      <AmbientDoodles />
       <PawConfetti active={petConfetti} />
       <AngryCatChaos active={chaosActive} />
       <header className="site-header">
@@ -507,14 +540,14 @@ export default function Home() {
               return <button key={item.label} className={`nav-link ${index === 0 ? "active" : ""}`} onClick={() => handleNav(item.label)}><Icon size={15} /> {item.label}</button>;
             })}
           </nav>
-          <div className="header-actions"><div className="notification-wrap"><button className="notification-button" aria-label="Friend requests" onClick={() => setActivePanel("friends")}><Bell size={18} /></button><motion.span className="notification-badge" animate={{ scale: Math.min(1.8, 1 + badgeCount * 0.07) }} transition={{ type: "spring", stiffness: 320, damping: 16 }}>{badgeCount}</motion.span></div><button className="mini-avatar" onClick={() => { setProfileDraft(profile); setActivePanel("profile"); }}><img src={profile.avatar} alt="Open your profile" /></button></div>
+          <div className="header-actions"><div className="notification-wrap"><button className="notification-button" aria-label="Friend requests" onClick={() => { setFriendSearchOpen(false); setActivePanel("friends"); }}><Bell size={18} /></button><motion.span className="notification-badge" animate={{ scale: Math.min(1.8, 1 + badgeCount * 0.07) }} transition={{ type: "spring", stiffness: 320, damping: 16 }}>{badgeCount}</motion.span></div><button className="mini-avatar" onClick={() => { setProfileDraft(profile); setActivePanel("profile"); }}><img src={profile.avatar} alt="Open your profile" /></button></div>
         </div>
       </header>
 
       <main className="page-wrap">
         <div className="danger-rail"><div className="danger-copy"><span className="danger-squiggle" /> <strong>feeling brave?</strong><span>we strongly advise against this</span></div><button className="do-not-touch-button" onClick={triggerChaos}><Cat size={20} /> DO NOT TOUCH <span className="danger-burst">!!</span></button></div>
         <section className="intro-row">
-          <div><div className="eyebrow"><span className="eyebrow-line" /> MORNING SCROLL · SEPTEMBER 02</div><h1>Good morning,<br /><span>Whiskers.</span></h1><p className="intro-copy">A carefully curated feed of cats doing more interesting things than you.</p></div>
+          <div><div className="eyebrow"><span className="eyebrow-line" /> POST-NAP SCROLL · SEPTEMBER 02</div><h1>Good afternoon,<br /><span>Whiskers.</span></h1><p className="intro-copy">A carefully curated feed of cats doing more interesting things than you.</p></div>
           <div className="scroll-sticker" aria-hidden="true"><WandSparkles size={18} /><span>behold the feed</span><PawPrint size={18} fill="currentColor" /></div>
         </section>
 
@@ -535,7 +568,7 @@ export default function Home() {
 
             <div className="feed-heading"><div><span className="section-kicker">THE SCRATCHING POST</span><h2>Fresh from the clowder</h2></div><button className="sort-button" onClick={() => showToast("The feed is already perfectly sorted by cat approval.")}>Latest <ChevronRight size={15} /></button></div>
             <div className="posts-list">
-              {posts.map((post) => <PostCard key={post.id} post={post} pulsing={pulsePost === post.id - 1} onFeedInteraction={bumpBadge} onPet={post.id === 6 ? handlePet : undefined} />)}
+              {posts.map((post) => <PostCard key={post.id} post={post} pulsing={pulsePost === post.id - 1} onFeedInteraction={bumpBadge} onNotice={showToast} onPet={post.id === 6 ? handlePet : undefined} />)}
             </div>
           </section>
 
@@ -554,7 +587,12 @@ export default function Home() {
           <motion.section className={`interaction-panel ${activePanel === "friends" ? "friends-panel" : "profile-panel"}`} initial={{ opacity: 0, y: 22, scale: .95, rotate: -1 }} animate={{ opacity: 1, y: 0, scale: 1, rotate: 0 }} exit={{ opacity: 0, y: 12, scale: .96 }} transition={{ type: "spring", stiffness: 300, damping: 22 }} onClick={(event) => event.stopPropagation()} role="dialog" aria-modal="true">
             <button className="panel-close" onClick={() => setActivePanel(null)} aria-label="Close panel"><X size={18} /></button>
             {activePanel === "friends" ? <>
-              <div className="panel-icon"><Users size={24} /></div><span className="panel-kicker">THE FRIENDS DEPARTMENT</span><h2>No friends, :(</h2><p className="panel-copy">Add some! Or don’t. The cats have made peace with both outcomes.</p><div className="friend-empty-doodle"><Cat size={62} /><PawPrint size={28} fill="currentColor" /><span>friendship is a human construct</span></div><button className="primary-button panel-action" onClick={() => showToast("Friend request sent to a cat. It will be ignored with dignity.")}><Plus size={16} /> Add a cat anyway</button>
+              <div className="panel-icon"><Users size={24} /></div><span className="panel-kicker">THE FRIENDS DEPARTMENT</span><h2>{friendsList.length ? "Your tiny circle" : "No friends, :("}</h2><p className="panel-copy">{friendsList.length ? "A suspiciously social development. The cats are watching." : "Add some! Search any cat name. Every cat is available because this is a demo."}</p>
+              {!friendSearchOpen && !friendsList.length ? <><div className="friend-empty-doodle"><Cat size={62} /><PawPrint size={28} fill="currentColor" /><span>friendship is a human construct</span></div><button className="primary-button panel-action" onClick={() => setFriendSearchOpen(true)}><Plus size={16} /> Add a cat anyway</button></> : <><div className="friend-search"><input value={friendSearch} onChange={(event) => setFriendSearch(event.target.value)} placeholder="Search for a cat name..." aria-label="Search for a cat name" /><button onClick={() => setFriendSearch(friendSearch.trim() || "Marmalade")} aria-label="Search"><ChevronRight size={18} /></button></div><div className="friend-result"><div className="friend-result-avatar"><Cat size={25} /></div><div><strong>{friendSearch.trim() || "Marmalade"}</strong><span>@{(friendSearch.trim() || "marmalade").toLowerCase().replace(/\s+/g, "-")} · available now</span></div><button className="send-request-button" onClick={() => { const name = friendSearch.trim() || "Marmalade"; setFriendsList((current) => current.includes(name) ? current : [...current, name]); showToast("congrats! you have a new friend"); }}><Send size={14} /> Send friend request</button></div>{friendsList.length ? <div className="friend-list">{friendsList.map((friend) => <div className="friend-list-row" key={friend}><span className="friend-mini-cat"><Cat size={14} /></span><strong>{friend}</strong><span>new friend</span></div>)}</div> : null}</>}
+            </> : activePanel === "settings" ? <>
+              <div className="panel-heading"><div className="panel-icon pink-icon"><Settings2 size={24} /></div><div><span className="panel-kicker">LITTER BOX SETTINGS</span><h2>Very important settings</h2></div></div>
+              <div className="settings-list"><div><span>litter freshness</span><strong>87%</strong></div><div><span>zoomies notifications</span><strong>ON</strong></div><div><span>human access level</span><strong>limited</strong></div><div><span>preferred nap window</span><strong>14:00–17:00</strong></div></div>
+              <button className="primary-button panel-action" onClick={() => showToast("Settings saved. The litter box remains mysterious.")}><Save size={16} /> Save settings</button>
             </> : <>
               <div className="panel-heading"><div className="panel-icon pink-icon"><Cat size={24} /></div><div><span className="panel-kicker">YOUR PROFILE</span><h2>Edit profile</h2></div></div>
               <div className="profile-edit-avatar"><img src={profileDraft.avatar} alt="Profile preview" /></div>

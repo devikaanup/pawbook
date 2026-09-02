@@ -307,6 +307,40 @@ h1, h2, p { margin: 0; }
 .field-label { display: block; margin-top: 12px; font-size: 9px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
 .field-label input, .field-label textarea { display: block; width: 100%; margin-top: 5px; padding: 10px 11px; border: 1.5px solid var(--ink); border-radius: 10px; background: var(--butter); color: var(--ink); outline: 0; font-size: 13px; letter-spacing: normal; text-transform: none; resize: vertical; }
 .field-label input:focus, .field-label textarea:focus { box-shadow: 3px 3px 0 var(--lavender); }
+.ambient-doodles { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+.falling-yarn { position: absolute; top: -12vh; color: var(--pink); filter: drop-shadow(2px 2px 0 var(--ink)); }
+.flying-butterfly { position: absolute; left: 0; display: flex; align-items: center; color: var(--lavender); font-family: "Caveat", cursive; font-size: 31px; line-height: .7; filter: drop-shadow(1px 1px 0 var(--ink)); }
+.flying-butterfly span:first-child { transform: rotate(24deg); }
+.flying-butterfly span:nth-child(2) { transform: rotate(-24deg); }
+.flying-butterfly small { position: absolute; left: 11px; top: 11px; color: var(--pink); font-size: 10px; }
+.comments-drawer { margin: 0 -18px; padding: 12px 18px 15px 67px; border-top: 1px dashed var(--ink); background: color-mix(in srgb, var(--butter) 48%, transparent); overflow: hidden; }
+.comment-list { display: grid; gap: 7px; }
+.comment-line { display: flex; align-items: flex-start; gap: 7px; font-size: 10px; line-height: 1.3; }
+.comment-line strong { font-weight: 800; }
+.comment-avatar { display: inline-grid; place-items: center; width: 19px; height: 19px; flex: 0 0 auto; border: 1px solid var(--ink); border-radius: 50%; background: var(--pink); color: var(--lavender); }
+.comment-form { display: flex; gap: 6px; margin-top: 10px; }
+.comment-form input { min-width: 0; flex: 1; padding: 8px 9px; border: 1px solid var(--ink); border-radius: 9px; background: var(--butter); color: var(--ink); font-size: 10px; outline: 0; }
+.comment-form button { display: grid; place-items: center; width: 31px; border: 1px solid var(--ink); border-radius: 9px; background: var(--pink); cursor: pointer; }
+.comment-form button:hover { transform: translateY(-2px); background: var(--lavender); }
+.friend-search { display: flex; gap: 6px; margin: 22px 0 11px; }
+.friend-search input { min-width: 0; flex: 1; padding: 11px 12px; border: 1.5px solid var(--ink); border-radius: 11px; background: var(--butter); color: var(--ink); outline: 0; font-size: 12px; }
+.friend-search input:focus { box-shadow: 3px 3px 0 var(--lavender); }
+.friend-search button { width: 38px; display: grid; place-items: center; border: 1.5px solid var(--ink); border-radius: 11px; background: var(--pink); cursor: pointer; }
+.friend-search button:hover { transform: translateX(2px); }
+.friend-result { display: grid; grid-template-columns: 39px 1fr; gap: 7px 10px; align-items: center; padding: 11px; text-align: left; border: 1.5px solid var(--ink); border-radius: 12px; background: var(--butter); box-shadow: 3px 3px 0 var(--ink); }
+.friend-result-avatar { width: 39px; height: 39px; display: grid; place-items: center; border: 1px solid var(--ink); border-radius: 50%; background: var(--pink); }
+.friend-result strong, .friend-result span { display: block; }
+.friend-result strong { font-family: "Fredoka", sans-serif; font-size: 16px; }
+.friend-result span { font-size: 9px; opacity: .66; margin-top: 3px; }
+.send-request-button { grid-column: 1 / -1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 10px; border: 1px solid var(--ink); border-radius: 9px; background: var(--pink); font-size: 10px; font-weight: 800; cursor: pointer; }
+.send-request-button:hover { transform: translateY(-2px); background: var(--lavender); }
+.friend-list { display: grid; gap: 6px; margin-top: 17px; padding-top: 13px; border-top: 1px dashed var(--ink); text-align: left; }
+.friend-list-row { display: flex; align-items: center; gap: 8px; padding: 7px 0; font-size: 11px; }
+.friend-list-row > span:last-child { margin-left: auto; opacity: .58; font-size: 9px; }
+.friend-mini-cat { display: grid; place-items: center; width: 25px; height: 25px; border: 1px solid var(--ink); border-radius: 50%; background: var(--pink); }
+.settings-list { margin: 18px 0 20px; border-top: 1px dashed var(--ink); }
+.settings-list div { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 42px; border-bottom: 1px dashed var(--ink); font-size: 11px; }
+.settings-list strong { font-family: "Fredoka", sans-serif; color: var(--lavender); font-size: 14px; font-weight: 600; text-align: right; }
 
 @media (max-width: 920px) {
   .header-inner { gap: 13px; padding-left: 20px; padding-right: 20px; }
